@@ -38,6 +38,7 @@ X = np.array(df.drop(['label'],1))
 X = preprocessing.scale(X)
 X_lately = X[-forecast_out:]
 X = X[:-forecast_out]
+
 #Scikitlearn really helps in scaling
 
 df.dropna(inplace=True)
