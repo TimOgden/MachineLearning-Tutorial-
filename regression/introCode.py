@@ -21,14 +21,24 @@ forecast_col = 'Adj. Close'
 df.fillna(-999999, inplace=True)
 
 #This is the amount of days out we will predict using this data
-forecast_out = int(math.ceil(0.01*len(df)))
+forecast_out = int(math.ceil(0.5*len(df)))
 #Need to shift the column up by the forecast_out amount because it is a future prediction
 df['label'] = df[forecast_col].shift(-forecast_out)
 df.dropna(inplace=True)
-print(df.head())
+
 
 #1 means drop the column, not the row
-X = np.array(df.drop(['label']), 1)
+X = np.array(df.drop([forecast_col],1))
+#X = np.array(df.drop([forecast_col]), 1)
 y = np.array(df['label'])
 #Scikitlearn really helps in scaling
 X = preprocessing.scale(X)
+
+X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_size=0.2)
+clf = LinearRegression()
+#fit is synonymous with train
+clf.fit(X_train, y_train)
+#score is synonymous with score
+accuracy = clf.score(X_test, y_test)
+print(df.tail())
+print(accuracy)
