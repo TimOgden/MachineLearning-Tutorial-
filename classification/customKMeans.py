@@ -47,7 +47,7 @@ class K_Means:
 			for c in self.centroids:
 				original_centroid = prev_centroids[c]
 				current_centroid = self.centroids[c]
-				if np.sum((current_centroid-original_centroid)/original_centroid*100) > self.tol:
+				if np.sum(np.abs((current_centroid-original_centroid)/original_centroid*100)) > self.tol:
 					optimized = False
 			if self.disp_iter != -1 and i%self.disp_iter==0:
 				self.plot_data(self.centroids, self.classifications)
@@ -122,7 +122,7 @@ X = np.array(df.drop(['survived'], 1).astype(float))
 X = preprocessing.scale(X)
 y = np.array(df['survived'])
 
-clf = K_Means(disp_iter=-1)
+clf = K_Means(disp_iter=-1, k=2)
 clf.fit(X)
 correct = 0
 for c, answer in enumerate(y):
