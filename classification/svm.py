@@ -1,7 +1,6 @@
 import numpy as np
 from sklearn import preprocessing, model_selection, svm
 import pandas as pd
-
 df = pd.read_csv('breast-cancer-wisconsin.data.txt')
 df.replace('?', -99999, inplace=True)
 df.drop(['id'], 1, inplace=True)
