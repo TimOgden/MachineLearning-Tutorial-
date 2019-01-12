@@ -58,7 +58,7 @@ def initial_population():
 	np.save('saved.npy', training_data_save)
 	print('Average accepted score:', mean(accepted_scores))
 	print('Median accepted score:', median(accepted_scores))
-	print(Counter(accepted_scores))
+	#print(Counter(accepted_scores))
 	return training_data
 
 #initial_population()
@@ -95,26 +95,44 @@ def train_model(training_data, model=False):
 
 training_data = initial_population()
 model = train_model(training_data)
-scores = []
-choices = []
-for each_game in range(10):
-	score = 0
-	game_memory = []
-	prev_obs = []
-	env.reset()
-	for _ in range(goal_steps):
-		env.render()
-		if len(prev_obs) == 0:
-			action = random.randrange(0,2)
-		else:
-			action = int(np.round(model.predict(prev_obs.reshape(-1, len(prev_obs), 1))[0])[0])
-		choices.append(action)
-		new_observation, reward, done, info = env.step(action)
-		prev_obs = new_observation
-		game_memory.append([new_observation, action])
-		score += reward
-		if done:
-			break
-	scores.append(score)
-print('Average score:', sum(scores)/len(scores))
-print('Choice 1: {}, Choice 2: {}'.format(choices.count(1)/len(choices), choices.count(0)/len(choices)))
+n_games = 10000
+for _ in range(2):
+	scores = []
+	choices = []
+	training_data = []
+	accepted_scores = []
+	for each_game in range(n_games):
+		score = 0
+		game_memory = []
+		prev_obs = []
+		env.reset()
+		for _ in range(goal_steps):
+			#env.render()
+			if len(prev_obs) == 0:
+				action = random.randrange(0,2)
+			else:
+				action = int(np.round(model.predict(prev_obs.reshape(-1, len(prev_obs), 1))[0])[0])
+			choices.append(action)
+			new_observation, reward, done, info = env.step(action)
+			prev_obs = new_observation
+			game_memory.append([new_observation, action])
+			score += reward
+			if done:
+				break
+		if score >= 150:
+			#print('test')
+			accepted_scores.append(score)
+			for data in game_memory:
+				training_data.append([data[0], data[1]])
+		scores.append(score)
+	print('Almost done')
+	training_data_save = np.array(training_data)
+	np.save('saved.npy', training_data_save)
+	if len(accepted_scores)>0:
+		print('Average accepted score:', mean(accepted_scores))
+		print('Median accepted score:', median(accepted_scores))
+	else:
+		print('0 accepted scores????')
+	print('Average score:', sum(scores)/len(scores))
+	#print('Choice 1: {}, Choice 2: {}'.format(choices.count(1)/len(choices), choices.count(0)/len(choices)))
+	model = train_model(training_data)
